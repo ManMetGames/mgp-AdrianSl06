@@ -65,6 +65,9 @@ void AMGP_2526Character::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMGP_2526Character::Look);
+
+		// Wall Merging
+		EnhancedInputComponent->BindAction(MergeAction, ETriggerEvent::Started, this, &AMGP_2526Character::TryMerge);
 	}
 	else
 	{
@@ -130,4 +133,10 @@ void AMGP_2526Character::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+void AMGP_2526Character::TryMerge()
+{
+	// signalled when player presses the merge input
+	UE_LOG(LogTemp, Warning, TEXT("Merge Pressed"));
 }
