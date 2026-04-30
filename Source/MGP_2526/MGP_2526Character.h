@@ -88,8 +88,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
 
+	// Wall Merge State
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Merge")
+	bool bIsMerged = false;
+
 	// Wall Merge Input
+	UFUNCTION(BlueprintCallable, Category = "Wall Merge")
 	void TryMerge();
+
+	// Toggles the merge state from Blueprint
+	UFUNCTION(BlueprintCallable, Category = "Wall Merge")
+	void ToggleMergeState();
 
 public:
 

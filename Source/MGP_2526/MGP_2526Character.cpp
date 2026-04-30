@@ -140,3 +140,10 @@ void AMGP_2526Character::TryMerge()
 	// signalled when player presses the merge input
 	UE_LOG(LogTemp, Warning, TEXT("Merge Pressed"));
 }
+
+void AMGP_2526Character::ToggleMergeState()
+{
+	bIsMerged = !bIsMerged;
+
+	UE_LOG(LogTemp, Warning, TEXT("Merge state toggled: %s"), bIsMerged ? TEXT("Merged") : TEXT("Not Merged"));
+}
