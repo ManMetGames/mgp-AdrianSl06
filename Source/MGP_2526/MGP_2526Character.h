@@ -100,6 +100,27 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Wall Merge")
 	void ToggleMergeState();
 
+	// ------------------------------------------
+
+	// Blink Ability
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
+	float BlinkDistance = 600.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
+	int32 BlinkCharge = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
+	int32 MaxBlinkCharges = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
+	float BlinkWallOffset = 50.0f;
+
+	UFUNCTION(BlueprintCallable, Category = "Blink")
+	void TryBlink();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Blink")
+	void OnBlinkSuccessful();
+
 public:
 
 	/** Returns CameraBoom subobject **/

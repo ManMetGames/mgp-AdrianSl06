@@ -147,3 +147,20 @@ void AMGP_2526Character::ToggleMergeState()
 
 	UE_LOG(LogTemp, Warning, TEXT("Merge state toggled: %s"), bIsMerged ? TEXT("Merged") : TEXT("Not Merged"));
 }
+
+// Blinking
+
+void AMGP_2526Character::TryBlink()
+{
+	if (BlinkCharge <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No blink charges remaining"));
+		return;
+	}
+
+	const FVector Start = GetActorLocation();
+	const FVector Forward = GetActorForwardVector();
+	const FVector End = Start + (Forward * BlinkDistance);
+
+
+}
