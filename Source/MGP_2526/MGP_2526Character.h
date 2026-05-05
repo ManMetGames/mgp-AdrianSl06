@@ -103,23 +103,50 @@ public:
 	// ------------------------------------------
 
 	// Blink Ability
+
+	// Distance of blink
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
 	float BlinkDistance = 600.0f;
 
+	// Current blink number
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
 	int32 BlinkCharge = 3;
 
+	// Max blink number 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
 	int32 MaxBlinkCharges = 3;
-
+	
+	// Distance from wall to player, if player blinks into wall or another solid object
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
 	float BlinkWallOffset = 50.0f;
 
 	UFUNCTION(BlueprintCallable, Category = "Blink")
 	void TryBlink();
 
+	// used for the feedback (animations, etc)
 	UFUNCTION(BlueprintImplementableEvent, Category = "Blink")
 	void OnBlinkSuccessful();
+
+	// Time between each recharge
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
+	float BlinkRechargeTime = 2.0f;
+
+	// Stops multiple chargers to be running at the same time
+	UPROPERTY(BlueprintReadOnly, Category = "Blink")
+	bool bIsRechargingBlink = false;
+
+	// Stores timer for recharging blinks
+	FTimerHandle BlinkRechargeTimerHandle;
+
+	// If the blink fails this is ran
+	UFUNCTION(BlueprintImplementableEvent, Category = "Blink")
+	void OnBlinkFailed();
+
+	// +1 blink charge
+	void RechargeBlink();
+
+	// Starts blink recharge
+	void StartBlinkRecharge();
 
 public:
 

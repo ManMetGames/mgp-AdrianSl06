@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "MGP_2526.h"
+#include "TimerManager.h"
 
 AMGP_2526Character::AMGP_2526Character()
 {
@@ -152,15 +153,90 @@ void AMGP_2526Character::ToggleMergeState()
 
 void AMGP_2526Character::TryBlink()
 {
+	// Stops the blink if the player has no more charges left
 	if (BlinkCharge <= 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No blink charges remaining"));
+		UE_LOG(LogTemp, Warning, TEXT("No blink charges"));
+		OnBlinkFailed();
+
 		return;
 	}
 
-	const FVector Start = GetActorLocation();
-	const FVector Forward = GetActorForwardVector();
-	const FVector End = Start + (Forward * BlinkDistance);
+	// start and end point of the blink
+	const FVector StartLocation = GetActorLocation();
+	const FVector ForwardDirection = GetActorForwardVector();
+	const FVector FullBlinkLocation = StartLocation + (ForwardDirection * BlinkDistance);
 
+	// Line trace to stop player from blinking into the wall (Wall detection)
+	FHitResult HitResult;
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(this);
 
+	const bool bHitWall = GetWorld()->LineTraceSingleByChannel
+	(HitResult,StartLocation,FullBlinkLocation,ECC_Visibility,TraceParams);
+
+	// Final - this is the location the player blinks to
+	FVector FinalBlinkLocation = FullBlinkLocation;
+
+	// If the line trace hits a wall, this 
+	if (bHitWall)
+	{
+		FinalBlinkLocation = HitResult.ImpactPoint + (HitResult.ImpactNormal * BlinkWallOffset);
+	}
+
+	// Sends player to Final location
+	SetActorLocation(FinalBlinkLocation);
+
+	// -1 Blink Charge
+	BlinkCharge--;
+
+	UE_LOG(LogTemp, Warning, TEXT("Charges left: %d"), BlinkCharge);
+
+	// Starts the recharge system
+	StartBlinkRecharge();
+
+	// Feedback (on blueprint)
+	OnBlinkSuccessful();
+}
+
+// ----------------------------------------------------
+
+void AMGP_2526Character::StartBlinkRecharge()
+{
+	// Stops multiple recharge timers from running at the same time
+	if (bIsRechargingBlink)
+	{
+		return;
+	}
+
+	if (BlinkCharge >= MaxBlinkCharges)
+	{
+		return;
+	}
+
+	bIsRechargingBlink = true;
+
+	// Once blinkrechargetime ends, recharge one blink
+	GetWorldTimerManager().SetTimer(BlinkRechargeTimerHandle,this,&AMGP_2526Character::RechargeBlink,BlinkRechargeTime,true);
+}
+
+void AMGP_2526Character::RechargeBlink()
+{
+	BlinkCharge++;
+
+	if (BlinkCharge > MaxBlinkCharges)
+	{
+		BlinkCharge = MaxBlinkCharges;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Charges: %d"), BlinkCharge);
+
+	// stops recharge if full
+	if (BlinkCharge >= MaxBlinkCharges)
+	{
+		GetWorldTimerManager().ClearTimer(BlinkRechargeTimerHandle);
+		bIsRechargingBlink = false;
+
+		UE_LOG(LogTemp, Warning, TEXT("Blink is full"));
+	}
 }
