@@ -136,20 +136,22 @@ void AMGP_2526Character::DoJumpEnd()
 	StopJumping();
 }
 
-void AMGP_2526Character::TryMerge()
-{
-	// signalled when player presses the merge input
-	UE_LOG(LogTemp, Warning, TEXT("Merge Pressed"));
-}
+// Old Merge Mechanic ---------------------------------------------------------------------------------------------------
 
-void AMGP_2526Character::ToggleMergeState()
-{
-	bIsMerged = !bIsMerged;
+//void AMGP_2526Character::TryMerge()
+//{
+//	// signalled when player presses the merge input
+//	UE_LOG(LogTemp, Warning, TEXT("Merge Pressed"));
+//}
+//
+//void AMGP_2526Character::ToggleMergeState()
+//{
+//	bIsMerged = !bIsMerged;
+//
+//	UE_LOG(LogTemp, Warning, TEXT("Merge state toggled: %s"), bIsMerged ? TEXT("Merged") : TEXT("Not Merged"));
+//}
 
-	UE_LOG(LogTemp, Warning, TEXT("Merge state toggled: %s"), bIsMerged ? TEXT("Merged") : TEXT("Not Merged"));
-}
-
-// Blinking
+// Blinking ------------------------------------------------------------------------------------------------------------
 
 void AMGP_2526Character::TryBlink()
 {
@@ -185,10 +187,11 @@ void AMGP_2526Character::TryBlink()
 	}
 
 	// Sends player to Final location
-	SetActorLocation(FinalBlinkLocation);
+	SetActorLocation(FinalBlinkLocation,true);
 
 	// -1 Blink Charge
 	BlinkCharge--;
+
 
 	UE_LOG(LogTemp, Warning, TEXT("Charges left: %d"), BlinkCharge);
 
