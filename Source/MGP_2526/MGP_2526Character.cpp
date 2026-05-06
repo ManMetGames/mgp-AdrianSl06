@@ -31,7 +31,7 @@ AMGP_2526Character::AMGP_2526Character()
 	// instead of recompiling to adjust them
 	GetCharacterMovement()->JumpZVelocity = 400.f;
 	GetCharacterMovement()->AirControl = 1.0f;
-	GetCharacterMovement()->MaxWalkSpeed = 750.f;
+	GetCharacterMovement()->MaxWalkSpeed = 900.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
