@@ -29,9 +29,9 @@ AMGP_2526Character::AMGP_2526Character()
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
-	GetCharacterMovement()->JumpZVelocity = 500.f;
-	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	GetCharacterMovement()->JumpZVelocity = 400.f;
+	GetCharacterMovement()->AirControl = 1.0f;
+	GetCharacterMovement()->MaxWalkSpeed = 750.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
@@ -66,9 +66,6 @@ void AMGP_2526Character::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMGP_2526Character::Look);
-
-		// Wall Merging
-		EnhancedInputComponent->BindAction(MergeAction, ETriggerEvent::Started, this, &AMGP_2526Character::TryMerge);
 	}
 	else
 	{
@@ -136,21 +133,6 @@ void AMGP_2526Character::DoJumpEnd()
 	StopJumping();
 }
 
-// Old Merge Mechanic ---------------------------------------------------------------------------------------------------
-
-//void AMGP_2526Character::TryMerge()
-//{
-//	// signalled when player presses the merge input
-//	UE_LOG(LogTemp, Warning, TEXT("Merge Pressed"));
-//}
-//
-//void AMGP_2526Character::ToggleMergeState()
-//{
-//	bIsMerged = !bIsMerged;
-//
-//	UE_LOG(LogTemp, Warning, TEXT("Merge state toggled: %s"), bIsMerged ? TEXT("Merged") : TEXT("Not Merged"));
-//}
-
 // Blinking ------------------------------------------------------------------------------------------------------------
 
 void AMGP_2526Character::TryBlink()
@@ -192,6 +174,7 @@ void AMGP_2526Character::TryBlink()
 	// -1 Blink Charge
 	BlinkCharge--;
 
+	OnBlinkChargesChanged();
 
 	UE_LOG(LogTemp, Warning, TEXT("Charges left: %d"), BlinkCharge);
 
@@ -226,6 +209,8 @@ void AMGP_2526Character::StartBlinkRecharge()
 void AMGP_2526Character::RechargeBlink()
 {
 	BlinkCharge++;
+
+	OnBlinkChargesChanged();
 
 	if (BlinkCharge > MaxBlinkCharges)
 	{

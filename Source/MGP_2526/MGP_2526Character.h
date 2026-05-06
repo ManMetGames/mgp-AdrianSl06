@@ -49,9 +49,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
-	UInputAction* MergeAction;
-
 public:
 
 	/** Constructor */
@@ -88,18 +85,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
 
-	// Wall Merge State
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Merge")
-	bool bIsMerged = false;
-
-	// Wall Merge Input
-	UFUNCTION(BlueprintCallable, Category = "Wall Merge")
-	void TryMerge();
-
-	// Toggles the merge state from Blueprint
-	UFUNCTION(BlueprintCallable, Category = "Wall Merge")
-	void ToggleMergeState();
-
 	// ------------------------------------------
 
 	// Blink Ability
@@ -110,11 +95,11 @@ public:
 
 	// Current blink number
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
-	int32 BlinkCharge = 3;
+	int32 BlinkCharge = 2;
 
 	// Max blink number 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
-	int32 MaxBlinkCharges = 3;
+	int32 MaxBlinkCharges = 2;
 	
 	// Distance from wall to player, if player blinks into wall or another solid object
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
@@ -147,6 +132,10 @@ public:
 
 	// Starts blink recharge
 	void StartBlinkRecharge();
+
+	// Used when blink charge changes (FOR UI)
+	UFUNCTION(BlueprintImplementableEvent, Category = "Blink")
+	void OnBlinkChargesChanged();
 
 public:
 
