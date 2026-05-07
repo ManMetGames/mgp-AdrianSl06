@@ -192,7 +192,7 @@ void AMGP_2526Character::TryBlink()
 void AMGP_2526Character::StartBlinkRecharge()
 {
 	// Stops multiple recharge timers from running at the same time
-	if (bIsRechargingBlink)
+	if (IsRechargingBlink)
 	{
 		return;
 	}
@@ -202,7 +202,7 @@ void AMGP_2526Character::StartBlinkRecharge()
 		return;
 	}
 
-	bIsRechargingBlink = true;
+	IsRechargingBlink = true;
 
 	// Once blinkrechargetime ends, recharge one blink
 	GetWorldTimerManager().SetTimer(BlinkRechargeTimerHandle,this,&AMGP_2526Character::RechargeBlink,BlinkRechargeTime,true);
@@ -225,8 +225,35 @@ void AMGP_2526Character::RechargeBlink()
 	if (BlinkCharge >= MaxBlinkCharges)
 	{
 		GetWorldTimerManager().ClearTimer(BlinkRechargeTimerHandle);
-		bIsRechargingBlink = false;
+		IsRechargingBlink = false;
 
 		UE_LOG(LogTemp, Warning, TEXT("Blink is full"));
 	}
+}
+
+void AMGP_2526Character::TryJumpOrFlyBoost()
+{
+	// on ground do normal jump
+	if (!GetCharacterMovement()->IsFalling())
+	{
+		Jump();
+		return;
+	}
+
+	// Player in air = able to boost
+	if (CanFlyBoost)
+	{
+		const FVector BoostVelocity = FVector(0.0f, 0.0f, FlyBoostStrength);
+
+		LaunchCharacter(BoostVelocity,false,true);
+		CanFlyBoost = false;
+		OnFlyBoostSuccessful();
+	}
+}
+
+// Resets boost when player lands 
+void AMGP_2526Character::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	CanFlyBoost = true;
 }

@@ -118,7 +118,7 @@ public:
 
 	// Stops multiple chargers to be running at the same time
 	UPROPERTY(BlueprintReadOnly, Category = "Blink")
-	bool bIsRechargingBlink = false;
+	bool IsRechargingBlink = false;
 
 	// Stores timer for recharging blinks
 	FTimerHandle BlinkRechargeTimerHandle;
@@ -136,6 +136,27 @@ public:
 	// Used when blink charge changes (FOR UI)
 	UFUNCTION(BlueprintImplementableEvent, Category = "Blink")
 	void OnBlinkChargesChanged();
+
+	// Double Jump (FlyBoost)
+
+	// Checks if player can boost
+	UPROPERTY(BlueprintReadWrite, Category = "Fly Boost")
+	bool CanFlyBoost = true;
+
+	// Strength of the boost
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fly Boost")
+	float FlyBoostStrength = 900.0f;
+
+	// Used for FlyBoost feedback
+	UFUNCTION(BlueprintImplementableEvent, Category = "Fly Boost")
+	void OnFlyBoostSuccessful();
+
+	// 
+	UFUNCTION(BlueprintCallable, Category = "Fly Boost")
+	void TryJumpOrFlyBoost();
+
+	// NEWWW: Resets flyboost when the player lands.
+	virtual void Landed(const FHitResult& Hit) override;
 
 public:
 
