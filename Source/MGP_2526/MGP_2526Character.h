@@ -91,7 +91,7 @@ public:
 
 	// Distance of blink
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
-	float BlinkDistance = 600.0f;
+	float BlinkDistance = 650.0f;
 
 	// Current blink number
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
@@ -137,7 +137,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Blink")
 	void OnBlinkChargesChanged();
 
-	// Double Jump (FlyBoost)
+	// Double Jump (FlyBoost) -----------------------------------------
 
 	// Checks if player can boost
 	UPROPERTY(BlueprintReadWrite, Category = "Fly Boost")
