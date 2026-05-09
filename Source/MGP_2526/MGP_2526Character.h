@@ -151,11 +151,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Fly Boost")
 	void OnFlyBoostSuccessful();
 
-	// 
 	UFUNCTION(BlueprintCallable, Category = "Fly Boost")
 	void TryJumpOrFlyBoost();
 
-	// NEWWW: Resets flyboost when the player lands.
+	// Resets flyboost when the player lands.
 	virtual void Landed(const FHitResult& Hit) override;
 
 public:
