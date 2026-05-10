@@ -85,6 +85,78 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
 
+	// ------------------------------------------
+
+	// Blink Ability
+
+	// Distance of blink
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
+	float BlinkDistance = 650.0f;
+
+	// Current blink number
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
+	int32 BlinkCharge = 2;
+
+	// Max blink number 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
+	int32 MaxBlinkCharges = 2;
+	
+	// Distance from wall to player, if player blinks into wall or another solid object
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
+	float BlinkWallOffset = 50.0f;
+
+	UFUNCTION(BlueprintCallable, Category = "Blink")
+	void TryBlink();
+
+	// used for the feedback (animations, etc)
+	UFUNCTION(BlueprintImplementableEvent, Category = "Blink")
+	void OnBlinkSuccessful();
+
+	// Time between each recharge
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blink")
+	float BlinkRechargeTime = 2.0f;
+
+	// Stops multiple chargers to be running at the same time
+	UPROPERTY(BlueprintReadOnly, Category = "Blink")
+	bool IsRechargingBlink = false;
+
+	// Stores timer for recharging blinks
+	FTimerHandle BlinkRechargeTimerHandle;
+
+	// If the blink fails this is ran
+	UFUNCTION(BlueprintImplementableEvent, Category = "Blink")
+	void OnBlinkFailed();
+
+	// +1 blink charge
+	void RechargeBlink();
+
+	// Starts blink recharge
+	void StartBlinkRecharge();
+
+	// Used when blink charge changes (FOR UI)
+	UFUNCTION(BlueprintImplementableEvent, Category = "Blink")
+	void OnBlinkChargesChanged();
+
+	// Double Jump (FlyBoost) -----------------------------------------
+
+	// Checks if player can boost
+	UPROPERTY(BlueprintReadWrite, Category = "Fly Boost")
+	bool CanFlyBoost = true;
+
+	// Strength of the boost
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fly Boost")
+	float FlyBoostStrength = 900.0f;
+
+	// Used for FlyBoost feedback
+	UFUNCTION(BlueprintImplementableEvent, Category = "Fly Boost")
+	void OnFlyBoostSuccessful();
+
+	UFUNCTION(BlueprintCallable, Category = "Fly Boost")
+	void TryJumpOrFlyBoost();
+
+	// Resets flyboost when the player lands.
+	virtual void Landed(const FHitResult& Hit) override;
+
 public:
 
 	/** Returns CameraBoom subobject **/

@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "MGP_2526.h"
+#include "TimerManager.h"
 
 AMGP_2526Character::AMGP_2526Character()
 {
@@ -27,10 +28,10 @@ AMGP_2526Character::AMGP_2526Character()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
-	// instead of recompiling to adjust them
+	// instead of recompiling to adjust them 
 	GetCharacterMovement()->JumpZVelocity = 500.f;
-	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	GetCharacterMovement()->AirControl = 0.45f;
+	GetCharacterMovement()->MaxWalkSpeed = 900.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
@@ -130,4 +131,129 @@ void AMGP_2526Character::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+// Blinking ------------------------------------------------------------------------------------------------------------
+
+void AMGP_2526Character::TryBlink()
+{
+	// Stops the blink if the player has no more charges left
+	if (BlinkCharge <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No blink charges"));
+		OnBlinkFailed();
+
+		return;
+	}
+
+	// start and end point of the blink
+	const FVector StartLocation = GetActorLocation(); 
+	const FRotator ControlRotation = GetControlRotation();
+	const FVector BlinkDirection = ControlRotation.Vector();
+	const FVector FullBlinkLocation = StartLocation + (BlinkDirection * BlinkDistance);
+
+
+	// Line trace to stop player from blinking into the wall (Wall detection)
+	FHitResult HitResult;
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(this);
+
+	const bool bHitWall = GetWorld()->LineTraceSingleByChannel
+	(HitResult,StartLocation,FullBlinkLocation,ECC_Visibility,TraceParams);
+
+	// Final - this is the location the player blinks to
+	FVector FinalBlinkLocation = FullBlinkLocation;
+
+	// If the line trace hits a wall, this 
+	if (bHitWall)
+	{
+		FinalBlinkLocation = HitResult.ImpactPoint + (HitResult.ImpactNormal * BlinkWallOffset);
+	}
+
+	// Sends player to Final location
+	SetActorLocation(FinalBlinkLocation,true);
+
+	// -1 Blink Charge
+	BlinkCharge--;
+
+	OnBlinkChargesChanged();
+
+	UE_LOG(LogTemp, Warning, TEXT("Charges left: %d"), BlinkCharge);
+
+	// Starts the recharge system
+	StartBlinkRecharge();
+
+	// Feedback (on blueprint)
+	OnBlinkSuccessful();
+}
+
+// ----------------------------------------------------
+
+void AMGP_2526Character::StartBlinkRecharge()
+{
+	// Stops multiple recharge timers from running at the same time
+	if (IsRechargingBlink)
+	{
+		return;
+	}
+
+	if (BlinkCharge >= MaxBlinkCharges)
+	{
+		return;
+	}
+
+	IsRechargingBlink = true;
+
+	// Once blinkrechargetime ends, recharge one blink
+	GetWorldTimerManager().SetTimer(BlinkRechargeTimerHandle,this,&AMGP_2526Character::RechargeBlink,BlinkRechargeTime,true);
+}
+
+void AMGP_2526Character::RechargeBlink()
+{
+	BlinkCharge++;
+
+	OnBlinkChargesChanged();
+
+	if (BlinkCharge > MaxBlinkCharges)
+	{
+		BlinkCharge = MaxBlinkCharges;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Charges: %d"), BlinkCharge);
+
+	// stops recharge if full
+	if (BlinkCharge >= MaxBlinkCharges)
+	{
+		GetWorldTimerManager().ClearTimer(BlinkRechargeTimerHandle);
+		IsRechargingBlink = false;
+
+		UE_LOG(LogTemp, Warning, TEXT("Blink is full"));
+	}
+}
+
+void AMGP_2526Character::TryJumpOrFlyBoost()
+{
+	// on ground do normal jump
+	if (!GetCharacterMovement()->IsFalling())
+	{
+		Jump();
+		return;
+	}
+
+	// Player in air = able to boost
+	if (CanFlyBoost)
+	{
+		const FVector BoostVelocity = FVector(0.0f, 0.0f, FlyBoostStrength);
+
+		LaunchCharacter(BoostVelocity,false,true);
+		CanFlyBoost = false;
+		OnFlyBoostSuccessful();
+	}
+}
+
+// Resets boost when player lands 
+void AMGP_2526Character::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	CanFlyBoost = true;
 }
