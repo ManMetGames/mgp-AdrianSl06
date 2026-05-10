@@ -28,7 +28,7 @@ AMGP_2526Character::AMGP_2526Character()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
-	// instead of recompiling to adjust them
+	// instead of recompiling to adjust them 
 	GetCharacterMovement()->JumpZVelocity = 500.f;
 	GetCharacterMovement()->AirControl = 0.45f;
 	GetCharacterMovement()->MaxWalkSpeed = 900.f;
@@ -147,7 +147,7 @@ void AMGP_2526Character::TryBlink()
 	}
 
 	// start and end point of the blink
-	const FVector StartLocation = GetActorLocation();
+	const FVector StartLocation = GetActorLocation(); 
 	const FRotator ControlRotation = GetControlRotation();
 	const FVector BlinkDirection = ControlRotation.Vector();
 	const FVector FullBlinkLocation = StartLocation + (BlinkDirection * BlinkDistance);
